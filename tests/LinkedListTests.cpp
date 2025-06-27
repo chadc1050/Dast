@@ -57,4 +57,14 @@ TEST_CASE("LinkedList", "[linkedlist]") {
         REQUIRE(list.at(3) == 4);
         REQUIRE(list.at(4) == 5);
     }
+
+    SECTION("iter") {
+        LinkedList list = {1, 2, 3, 4, 5};
+
+        int counter = 1;
+        for (int item: list) {
+            REQUIRE(item == counter);
+            counter++;
+        }
+    }
 }

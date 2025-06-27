@@ -1,5 +1,6 @@
 #pragma once
 #include <stdexcept>
+
 namespace Dast {
     template<typename T>
     struct Node {
@@ -9,6 +10,14 @@ namespace Dast {
         explicit Node(T data) : data(data), next(nullptr) {}
         Node(T data, Node* next) : data(data), next(next) {}
         Node() : data(nullptr), next(nullptr) {}
+
+        bool operator==(Node other) {
+            return next == other.next;
+        }
+
+        bool operator!=(Node other) {
+            return next != other.next;
+        }
     };
 
     template<typename T>
@@ -19,6 +28,55 @@ namespace Dast {
             for (size_t i = init.size(); i > 0; --i) {
                 push_front(init.begin()[i - 1]);
             }
+        }
+
+        struct Iterator {
+
+            Node<T>* curr;
+
+            explicit Iterator(Node<T>* curr) noexcept : curr(curr) {}
+
+            Iterator& operator=(Node<T>* node) {
+                curr = node;
+                return *this;
+            }
+
+            Iterator& operator++() {
+                if (curr->next != nullptr) {
+                    curr = curr->next;
+                }
+                return *this;
+            }
+
+            Iterator operator++(int) {
+                Iterator iterator = *this;
+                ++*this;
+                return iterator;
+            }
+
+            bool operator==(const Iterator& other) {
+                return curr->next == other.curr;
+            }
+
+            bool operator!=(const Iterator& other) {
+                auto var = curr->next != other.curr;
+                return var;
+            }
+
+            int operator*() {
+                if (curr == nullptr) {
+                    throw std::runtime_error("Dereferencing end iterator");
+                }
+                return curr->data;
+            }
+        };
+
+        Iterator begin() {
+            return Iterator(head);
+        }
+
+        Iterator end() {
+            return Iterator(nullptr);
         }
 
         T get_head() {
