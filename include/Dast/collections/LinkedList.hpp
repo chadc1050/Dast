@@ -91,10 +91,6 @@ namespace Dast {
             return curr->data;
         }
 
-        T operator[](const T item) {
-            return at(item);
-        }
-
         T operator[](const size_t index) {
             return at(index);
         }
@@ -143,6 +139,10 @@ namespace Dast {
             return size;
         }
 
+        bool empty() {
+            return head == nullptr;
+        }
+
         void push_front(T item) {
             if (head == nullptr) {
                 head = new Node<T>(item);
@@ -172,10 +172,11 @@ namespace Dast {
         void remove(const size_t index) {
             Node<T>* curr = head;
 
-            if (this->size() == 0) {
+            if (this->size() == 0 || index >= this->size()) {
                 throw std::out_of_range("Index out of range");
             }
 
+            // Delete the head
             if (index == 0) {
                 Node<T>* next = curr->next;
                 delete curr;
