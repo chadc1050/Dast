@@ -13,6 +13,8 @@ SET(ROOT_DIR .)
 INCLUDE_DIRECTORIES(
     ${ROOT_DIR}/include
     ${ROOT_DIR}/third-party/include
+    ${ROOT_DIR}/third-party/lib/catch2
+    ${ROOT_DIR}/third-party/include/catch2
 )
 
 FILE(GLOB_RECURSE PROJECT_HEADERS ${ROOT_DIR}/include/*.hpp)

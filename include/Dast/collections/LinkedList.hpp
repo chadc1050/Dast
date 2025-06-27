@@ -1,99 +1,163 @@
 #pragma once
 #include <stdexcept>
+namespace Dast {
+    template<typename T>
+    struct Node {
+        T data;
+        Node* next;
 
-template<typename T>
-struct Node<T> {
-    T data;
-    Node* next;
+        explicit Node(T data) : data(data), next(nullptr) {}
+        Node(T data, Node* next) : data(data), next(next) {}
+        Node() : data(nullptr), next(nullptr) {}
+    };
 
-    Node(T data, Node* next) : data(data), next(next) {}
-    Node(T data) : data(data), next(nullptr) {}
-    Node() : data(nullptr), next(nullptr) {}
-};
-
-template<typename T>
-class LinkedList<T> {
-public:
-    LinkedList() = default;
-
-    T get_head() {
-        return head->data;
-    }
-
-    T get_tail() {
-        Node<T>* curr = head;
-        while (head->next != nullptr) {
-            curr = curr->next;
+    template<typename T>
+    class LinkedList {
+    public:
+        LinkedList() = default;
+        LinkedList(std::initializer_list<T> init) {
+            for (size_t i = init.size(); i > 0; --i) {
+                push_front(init.begin()[i - 1]);
+            }
         }
-        return curr->data;
-    }
 
-    T at(const size_t index) {
-        Node<T>* curr = head;
-        for (size_t i = 0; i < index; i++) {
-            if (curr->next == nullptr) {
+        T get_head() {
+            return head->data;
+        }
+
+        T get_tail() {
+            Node<T>* curr = head;
+            while (curr->next != nullptr) {
+                curr = curr->next;
+            }
+            return curr->data;
+        }
+
+        T operator[](const T item) {
+            return at(item);
+        }
+
+        T operator[](const size_t index) {
+            return at(index);
+        }
+
+        T at(const size_t index) {
+            Node<T>* curr = head;
+            for (size_t i = 0; i < index; i++) {
+                if (curr->next == nullptr) {
+                    throw std::out_of_range("Index out of range");
+                }
+                curr = curr->next;
+            }
+
+            return curr->data;
+        }
+
+        bool contains(const T item) {
+            Node<T>* curr = head;
+            while (curr != nullptr) {
+                if (curr->data == item) {
+                    return true;
+                }
+                curr = curr->next;
+            }
+            return false;
+        }
+
+        void insert(const size_t index, T item) {
+            Node<T>* curr = head;
+            for (size_t i = 0; i < index; i++) {
+                if (curr->next == nullptr) {
+                    throw std::out_of_range("Index out of range");
+                }
+                curr = curr->next;
+            }
+            curr->next = new Node<T>(item, curr->next);
+        }
+
+        size_t size() {
+            Node<T>* curr = head;
+            size_t size = 0;
+            while (curr != nullptr) {
+                curr = curr->next;
+                size++;
+            }
+            return size;
+        }
+
+        void push_front(T item) {
+            if (head == nullptr) {
+                head = new Node<T>(item);
+                return;
+            }
+
+            head = new Node<T>(item, head);
+        }
+
+
+        void push_back(T item) {
+
+            if (head == nullptr) {
+                head = new Node<T>(item);
+                return;
+            }
+
+            Node<T>* curr = head;
+
+            while (curr->next != nullptr) {
+                curr = curr->next;
+            }
+
+            curr->next = new Node<T>(item);
+        }
+
+        void remove(const size_t index) {
+            Node<T>* curr = head;
+
+            if (this->size() == 0) {
                 throw std::out_of_range("Index out of range");
             }
-            curr = curr->next;
-        }
 
-        return curr->data;
-    }
-
-    bool contains(const T item) {
-        Node<T>* curr = head;
-        while (curr != nullptr) {
-            if (curr->data == item) {
-                return true;
+            if (index == 0) {
+                Node<T>* next = curr->next;
+                delete curr;
+                head = next;
+                return;
             }
-            curr = curr->next;
-        }
-        return false;
-    }
 
-    void insert(const size_t index, T item) {
-        Node<T>* curr = head;
-        for (size_t i = 0; i < index; i++) {
-            if (curr->next == nullptr) {
-                throw std::out_of_range("Index out of range");
+            for (size_t i = 0; i < index - 1; i++) {
+                if (curr->next == nullptr) {
+                    throw std::out_of_range("Index out of range");
+                }
+                curr = curr->next;
             }
-            curr = curr->next;
-        }
-        curr->next = new Node<T>(item, curr->next);
-    }
 
-    void push_back(T item) {
-        Node<T>* curr = head;
-        while (true) {
-            curr = curr->next;
-            if (curr == nullptr) {
-                curr = new Node<T>(item);
-                curr->next = nullptr;
-                break;
-            }
-        }
-    }
-
-    void clear() {
-        Node<T>* curr = head;
-        while (curr != nullptr) {
             Node<T>* next = curr->next;
-            delete curr;
-            curr = next;
+            curr->next = next->next;
+            delete next;
         }
-        head = nullptr;
-    }
 
-    ~LinkedList() {
-        Node<T>* curr = head;
-        while (curr != nullptr) {
-            Node<T>* next = curr->next;
-            delete curr;
-            curr = next;
+        void clear() {
+            Node<T>* curr = head;
+            while (curr != nullptr) {
+                Node<T>* next = curr->next;
+                delete curr;
+                curr = next;
+            }
+            head = nullptr;
         }
-    }
 
-private:
-    Node<T>* head = nullptr;
-};
+        ~LinkedList() {
+            Node<T>* curr = head;
+            while (curr != nullptr) {
+                Node<T>* next = curr->next;
+                delete curr;
+                curr = next;
+            }
+        }
+
+    private:
+        Node<T>* head = nullptr;
+    };
+}
 
